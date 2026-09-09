@@ -1,0 +1,28 @@
+resources:
+  jobs:
+    usdmep_job:
+      name: fetch_usdmep
+      schedule:
+        quartz_cron_expression: "0 0 22 * * ?"
+        timezone_id: "UTC"
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: usdmep
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/argmacro/usdmep.py
+            parameters:
+              - "--catalog"
+              - "personal"
+              - "--schema"
+              - "argmacro"
+              - "--table"
+              - "usdmep"
+              - "--start"
+              - ""
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - loguru

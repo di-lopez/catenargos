@@ -1,0 +1,16 @@
+# databricks.yml
+bundle:
+  name: projects
+  engine: direct
+
+include:
+  - resources/catalog.yml
+  - argmacro/pipeline.yml
+
+targets:
+  dev:
+
+    default: true
+    workspace:
+      host: https://dbc-6a88e8ae-d4f6.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}

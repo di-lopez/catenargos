@@ -1,0 +1,12 @@
+resources:
+
+  schemas:
+    raw:
+      name: raw
+      catalog_name: personal
+      comment: Immutable source files and extraction outputs
+
+    argmacro:
+      name: argmacro
+      catalog_name: personal
+      comment: Argentina Macroeconomic Series
