@@ -26,3 +26,30 @@ resources:
             client: "5"
             dependencies:
               - loguru
+
+    ipc_job:
+      name: fetch_ipc
+      schedule:
+        quartz_cron_expression: "0 0 22 * * ?"
+        timezone_id: "UTC"
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: ipc
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/argmacro/ipc.py
+            parameters:
+              - "--catalog"
+              - "personal"
+              - "--schema"
+              - "argmacro"
+              - "--table"
+              - "ipc"
+              - "--date"
+              - "{{job.start_time.iso_date}}"
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - loguru
