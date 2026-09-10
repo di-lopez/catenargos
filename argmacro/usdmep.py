@@ -6,7 +6,8 @@ import pyspark.sql.functions as f
 import requests
 import yaml
 from loguru import logger
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
+from utils import get_latest_date
 
 
 class Config:
@@ -79,13 +80,7 @@ def get_usdmep(
         logger.info("Start date not provided")
         if spark.catalog.tableExists(table_name):
             logger.info("Table exists, reading latest available date")
-            latest = (
-                spark.table(table_name)
-                .select(
-                    f.max("date").cast("date").alias("latest"),
-                )
-                .collect()[0]["latest"]
-            )
+            latest = get_latest_date(spark, table_name)
             logger.info(f"Latest available date is {latest:%Y-%m-%d}")
             start = (latest + pd.offsets.BDay(1)).date()
             logger.info(f"Setting fetch start date as {start:%Y-%m-%d}")
