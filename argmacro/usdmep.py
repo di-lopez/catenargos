@@ -11,7 +11,7 @@ from utils import get_latest_date
 
 
 class Config:
-    def __init__(self, config):
+    def __init__(self, config="config.yml"):
         with open(config) as f:
             self.config = yaml.safe_load(f)
 
@@ -85,7 +85,7 @@ def get_usdmep(
             start = (latest + pd.offsets.BDay(1)).date()
             logger.info(f"Setting fetch start date as {start:%Y-%m-%d}")
         else:
-            start = Config("config.yml").timeseries_start
+            start = Config().timeseries_start
             logger.info(f"Table does not exist, defaulting to {start:%Y-%m-%d}")
 
     headers = {
