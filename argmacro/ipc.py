@@ -191,7 +191,6 @@ class Pipeline:
             self.schema,
             file_date,
         ).process()
-        # TODO: Use the parser to read and create the table.
 
     def main(self):
         logger.info(f"Starting pipeline for {self.date:%Y-%m-%d}")
@@ -202,10 +201,10 @@ class Pipeline:
 
         logger.info("Reading latest available date from the table")
         latest = get_latest_date(self.spark, self.table_name)
-        if self.date.month <= latest.month:
+        if self.date.month - 1 <= latest.month:  # -1 as IPC is one month delayed
             logger.info(
-                f"Already have CPI data for the requested month ({self.date:%B}). "
-                "Nothing to do, exiting",
+                f"Already have CPI data for the requested release ({self.date:%B})."
+                " Nothing to do, exiting",
             )
             return
 
@@ -215,7 +214,7 @@ class Pipeline:
             logger.error("File download failed. Please review logs")
             raise Exception("File download failed")
 
-        self.process_file(file)
+        self.process_file(file, self.date)
 
 
 if __name__ == "__main__":

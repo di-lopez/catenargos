@@ -7,6 +7,11 @@ include:
   - resources/catalog.yml
   - argmacro/pipeline.yml
 
+
+variables:
+  warehouse_id:
+    default: 00863a62922a1c78
+
 targets:
   dev:
 

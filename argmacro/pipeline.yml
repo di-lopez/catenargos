@@ -54,3 +54,32 @@ resources:
             dependencies:
               - loguru
               - xlrd
+
+    ipc_views:
+      name: create_ipc_views
+      trigger:
+        table_update:
+          table_names:
+            - personal.argmacro.ipc
+      parameters:
+        - name: catalog
+          default: personal
+        - name: schema
+          default: argmacro
+      tasks:
+        - task_key: ipc_delta_m
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ${workspace.file_path}/argmacro/ipc_delta_m.sql
+            parameters:
+              catalog: '{{job.parameters.catalog}}'
+              schema: '{{job.parameters.schema}}'
+        - task_key: ipc_delta_y
+          sql_task:
+            warehouse_id: ${var.warehouse_id}
+            file:
+              path: ${workspace.file_path}/argmacro/ipc_delta_y.sql
+            parameters:
+              catalog: '{{job.parameters.catalog}}'
+              schema: '{{job.parameters.schema}}'
