@@ -115,16 +115,29 @@ def get_usdmep(
     df = pd.DataFrame(res.json()[1:], columns=["date", "value"])
     df["date"] = pd.to_datetime(df["date"], format="%d/%m/%Y")
 
-    logger.info(f"Fetched {len(df)} rows")
+    fetched_row_count = len(df)
+    logger.info(f"Fetched {fetched_row_count} rows")
 
     df = spark.createDataFrame(df).withColumn("date", f.col("date").cast("date"))
 
     if spark.catalog.tableExists(table_name):
-        df = spark.table(table_name).union(df)
+        df = df.join(
+            spark.table(table_name),
+            on=["date"],
+            how="left_anti",
+        )
+        new_dates_count = df.count()
+        if new_dates_count != fetched_row_count:
+            dropped = fetched_row_count - new_dates_count
+            logger.info(
+                f"Already have data for {dropped}/{fetched_row_count} days, "
+                f"skipping those. Inserting {new_dates_count} new rows",
+            )
+            return
 
     df = dq(df)
 
-    logger.info(f"The following rows will be inserted:\n {df.show()}")
+    logger.info(f"The following rows will be inserted:\n {df.toPandas()}")
 
     df.write.mode("append").saveAsTable(table_name)
 
