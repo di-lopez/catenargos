@@ -1,13 +1,23 @@
 import argparse
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pandas as pd
 import requests
+import xlrd
+import yaml
 from loguru import logger
-from pyspark.dbutils import DBUtils
 from pyspark.sql import SparkSession
 from utils import get_latest_date
-from pathlib import Path
+
+
+class Config:
+    def __init__(self, config="config.yml"):
+        with open(config) as f:
+            self.config = yaml.safe_load(f)
+
+    def __getattr__(self, name):
+        return self.config["ipc"][name]
 
 
 class FileDownloader:
@@ -26,6 +36,7 @@ class FileDownloader:
 
     @property
     def url(self) -> str:
+
         return f"https://www.indec.gob.ar/ftp/cuadros/economia/sh_ipc_{self.month}_{self.year}.xls"
 
     @property
@@ -73,32 +84,73 @@ class FileDownloader:
 
 
 class FileProcessor:
-    VOLUME = "ipc_downloads"
-
     def __init__(self, file: bytes, catalog: str, schema: str, file_date: datetime):
         self.file = file
         self.catalog = catalog
         self.schema = schema
         self.file_name = f"ipc_{file_date.year}_{file_date.month:02}.xls"
         self.spark = SparkSession.builder.getOrCreate()
-        self.dbutils = DBUtils(self.spark)
+        self.spark.catalog.setCurrentCatalog(catalog)
+        self.spark.catalog.setCurrentDatabase(schema)
 
     def process(self):
         self.store_file()
+        self.parse_file()
 
     def store_file(self):
 
-        path = Path("/Volumes") / self.catalog / "raw" / self.VOLUME / self.file_name
+        path = (
+            Path("/Volumes") / self.catalog / "raw" / Config().volume / self.file_name
+        )
         logger.info(f"Storing file at {path.absolute()}")
 
         with path.open("wb") as f:
             f.write(self.file)
 
-        if self.dbutils.fs.ls(path)[0]:
+        if path.exists():
             logger.info("File stored successfully")
         else:
             logger.error("File storage failed")
             raise Exception("File storage failed")
+
+    def parse_file(self):
+
+        logger.info("Starting file parsing")
+
+        wb = xlrd.open_workbook(file_contents=self.file)
+        sheet_name = Config().excel_target_sheet_name
+
+        sheet = wb.sheet_by_name(sheet_name)
+
+        if not sheet:
+            logger.error(f"Sheet `{sheet_name}` not found")
+            raise Exception("Sheet not found")
+
+        logger.info(
+            f"Read {sheet.nrows} rows and {sheet.ncols} columns from {sheet_name}",
+        )
+
+        date_row = [c.value.lower() for c in sheet.col(0)].index("total nacional")
+        value_row = [c.value.lower() for c in sheet.col(0)].index("nivel general")
+
+        # Take from column B (1) onwards
+        date = [c.value for c in sheet.row(date_row)][1:]
+        values = [c.value for c in sheet.row(value_row)][1:]
+
+        df = pd.DataFrame({"date": date, "value": values}).assign(
+            date=lambda x: (
+                pd.to_datetime(x.date, unit="D", origin="1899-12-30").dt.date
+            ),
+        )
+
+        logger.info(
+            "Extracted dataframe for range "
+            f"{df.date.min():%b %Y} to {df.date.max():%b %Y}",
+        )
+
+        df = self.spark.createDataFrame(df)
+        df.write.mode("overwrite").saveAsTable(Config().table_name)
+        logger.info("Completed file parsing")
 
 
 class Pipeline:

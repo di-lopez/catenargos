@@ -53,3 +53,4 @@ resources:
             client: "5"
             dependencies:
               - loguru
+              - xlrd
