@@ -1,14 +1,12 @@
 import argparse
-from datetime import datetime, timezone
-from pathlib import Path
+from datetime import datetime
 
 import pandas as pd
-import requests
 import xlrd
 import yaml
 from loguru import logger
-from pyspark.sql import SparkSession
-from utils import get_latest_date
+from pyspark.sql import DataFrame, SparkSession
+from utils import BaseFileDownloader, BaseFileProcessor, get_latest_date
 
 
 class Config:
@@ -20,103 +18,37 @@ class Config:
         return self.config["ipc"][name]
 
 
-class FileDownloader:
+class FileDownloader(BaseFileDownloader):
     """Download the IPC file for a given month and year."""
 
     def __init__(self, date: datetime | None = None):
-        self.date = date or datetime.now(tz=timezone.utc)
-
-    @property
-    def month(self) -> str:
-        return f"{self.date.month:02}"
-
-    @property
-    def year(self) -> str:
-        return f"{self.date.year}"[-2:]  # last 2 digits only
+        super().__init__(date)
 
     @property
     def url(self) -> str:
-
         return f"https://www.indec.gob.ar/ftp/cuadros/economia/sh_ipc_{self.month}_{self.year}.xls"
 
     @property
-    def file_exists(self) -> bool:
-
-        try:
-            # Use HEAD to fetch headers only, set timeout to prevent hanging
-            res = requests.head(self.url, allow_redirects=True, timeout=5)
-
-            if not res.ok:
-                return False
-
-        except requests.RequestException:
-            return False
-
-        # Verify the server reports an Excel file rather than HTML
-        content_type = res.headers.get("Content-Type", "").lower()
-
-        return "excel" in content_type
-
-    def get_file(self):
-        logger.info(f"Attempting download of file for {self.month}/{self.year}")
-
-        if not self.file_exists:
-            logger.warning("File not available yet. Exiting")
-            return None
-
-        logger.info("File exists. Proceeding to download...")
-
-        res = requests.get(self.url, allow_redirects=True)
-
-        if not res.ok:
-            logger.error(f"Download failed with status {res.status_code}: {res.reason}")
-            return None
-
-        # We expect a file size of the order of 2.25 MB
-        # Verify the size we get is of this order of magnitude
-        content_size = int(res.headers.get("Content-Length", 0)) / 1024**2
-        if content_size / 2.5 < 0.75:
-            logger.warning(f"Downloaded file is too small: {content_size} MB")
-        else:
-            logger.info(f"Download successful. File size: {content_size:.2f} MB")
-
-        return res.content
+    def expected_size(self) -> int:
+        """Expected file size in MB."""
+        return 2.5
 
 
-class FileProcessor:
+class FileProcessor(BaseFileProcessor):
     def __init__(self, file: bytes, catalog: str, schema: str, file_date: datetime):
-        self.file = file
-        self.catalog = catalog
-        self.schema = schema
-        self.file_name = f"ipc_{file_date.year}_{file_date.month:02}.xls"
-        self.spark = SparkSession.builder.getOrCreate()
-        self.spark.catalog.setCurrentCatalog(catalog)
-        self.spark.catalog.setCurrentDatabase(schema)
 
-    def process(self):
-        self.store_file()
-        self.parse_file()
-
-    def store_file(self):
-
-        path = (
-            Path("/Volumes") / self.catalog / "raw" / Config().volume / self.file_name
+        super().__init__(
+            file,
+            catalog,
+            schema,
+            Config().volume,
+            Config().table_name,
+            file_date,
+            prefix="ipc_",
         )
-        logger.info(f"Storing file at {path.absolute()}")
 
-        with path.open("wb") as f:
-            f.write(self.file)
-
-        if path.exists():
-            logger.info("File stored successfully")
-        else:
-            logger.error("File storage failed")
-            raise Exception("File storage failed")
-
-    def parse_file(self):
-
-        logger.info("Starting file parsing")
-
+    def parse_file(self) -> DataFrame:
+        """Parse the IPC Excel file and extract relevant data into a pandas DataFrame."""
         wb = xlrd.open_workbook(file_contents=self.file)
         sheet_name = Config().excel_target_sheet_name
 
@@ -124,7 +56,8 @@ class FileProcessor:
 
         if not sheet:
             logger.error(f"Sheet `{sheet_name}` not found")
-            raise Exception("Sheet not found")
+            msg = "Sheet not found"
+            raise Exception(msg)
 
         logger.info(
             f"Read {sheet.nrows} rows and {sheet.ncols} columns from {sheet_name}",
@@ -148,9 +81,7 @@ class FileProcessor:
             f"{df.date.min():%b %Y} to {df.date.max():%b %Y}",
         )
 
-        df = self.spark.createDataFrame(df)
-        df.write.mode("overwrite").saveAsTable(Config().table_name)
-        logger.info("Completed file parsing")
+        return self.spark.createDataFrame(df)
 
 
 class Pipeline:
