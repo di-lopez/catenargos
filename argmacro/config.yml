@@ -6,3 +6,8 @@ ipc:
   excel_target_sheet_name: "Índices IPC Cobertura Nacional"
   table_name: ipc
   volume: "ipc_downloads" # hard-coded to be within raw schema
+
+isac:
+  excel_target_sheet_name: "Cuadro 1"
+  table_name: isac
+  volume: "isac_downloads" # hard-coded to be within raw schema

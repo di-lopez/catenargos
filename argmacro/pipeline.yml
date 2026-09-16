@@ -83,3 +83,31 @@ resources:
             parameters:
               catalog: '{{job.parameters.catalog}}'
               schema: '{{job.parameters.schema}}'
+
+    isac_job:
+      name: fetch_isac
+      schedule:
+        quartz_cron_expression: "0 0 22 * * ?"
+        timezone_id: "UTC"
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: isac
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/argmacro/isac.py
+            parameters:
+              - "--catalog"
+              - "personal"
+              - "--schema"
+              - "argmacro"
+              - "--table"
+              - "isac"
+              - "--date"
+              - "{{job.start_time.iso_date}}"
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - loguru
+              - xlrd

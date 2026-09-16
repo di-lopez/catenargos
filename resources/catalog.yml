@@ -17,3 +17,9 @@ resources:
         catalog_name: personal
         schema_name: raw
         comment: IPC file downloads from INDEC
+
+      isac_downloads:
+        name: isac_downloads
+        catalog_name: personal
+        schema_name: raw
+        comment: ISAC file downloads from INDEC
