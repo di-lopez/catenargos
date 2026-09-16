@@ -40,6 +40,10 @@ class BaseFileProcessor(ABC):
         self.spark.catalog.setCurrentCatalog(catalog)
         self.spark.catalog.setCurrentDatabase(schema)
 
+    @property
+    def file_path(self) -> Path:
+        return Path("/Volumes") / self.catalog / "raw" / self.volume / self.file_name
+
     def process(self):
         self.store_file()
 
@@ -56,13 +60,12 @@ class BaseFileProcessor(ABC):
 
     def store_file(self):
 
-        path = Path("/Volumes") / self.catalog / "raw" / self.volume / self.file_name
-        logger.info(f"Storing file at {path.absolute()}")
+        logger.info(f"Storing file at {self.file_path.absolute()}")
 
-        with path.open("wb") as f:
+        with self.file_path.open("wb") as f:
             f.write(self.file)
 
-        if path.exists():
+        if self.file_path.exists():
             logger.info("File stored successfully")
         else:
             logger.error("File storage failed")
