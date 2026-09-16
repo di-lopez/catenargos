@@ -3,19 +3,9 @@ from datetime import datetime
 
 import pandas as pd
 import xlrd
-import yaml
 from loguru import logger
 from pyspark.sql import DataFrame, SparkSession
-from utils import BaseFileDownloader, BaseFileProcessor, get_latest_date
-
-
-class Config:
-    def __init__(self, config="config.yml"):
-        with open(config) as f:
-            self.config = yaml.safe_load(f)
-
-    def __getattr__(self, name):
-        return self.config["ipc"][name]
+from utils import BaseFileDownloader, BaseFileProcessor, Config, get_latest_date
 
 
 class FileDownloader(BaseFileDownloader):
@@ -41,8 +31,8 @@ class FileProcessor(BaseFileProcessor):
             file,
             catalog,
             schema,
-            Config().volume,
-            Config().table_name,
+            Config("ipc").volume,
+            Config("ipc").table_name,
             file_date,
             prefix="ipc_",
         )
@@ -50,7 +40,7 @@ class FileProcessor(BaseFileProcessor):
     def parse_file(self) -> DataFrame:
         """Parse the IPC Excel file and extract relevant data into a pandas DataFrame."""
         wb = xlrd.open_workbook(file_contents=self.file)
-        sheet_name = Config().excel_target_sheet_name
+        sheet_name = Config("ipc").excel_target_sheet_name
 
         sheet = wb.sheet_by_name(sheet_name)
 

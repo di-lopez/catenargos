@@ -4,19 +4,9 @@ from datetime import datetime, timezone
 import pandas as pd
 import pyspark.sql.functions as f
 import requests
-import yaml
 from loguru import logger
 from pyspark.sql import DataFrame, SparkSession
-from utils import get_latest_date
-
-
-class Config:
-    def __init__(self, config="config.yml"):
-        with open(config) as f:
-            self.config = yaml.safe_load(f)
-
-    def __getattr__(self, name):
-        return self.config["usdmep"][name]
+from utils import Config, get_latest_date
 
 
 def dedupe(df: DataFrame) -> DataFrame:
@@ -85,7 +75,7 @@ def get_usdmep(
             start = (latest + pd.offsets.BDay(1)).date()
             logger.info(f"Setting fetch start date as {start:%Y-%m-%d}")
         else:
-            start = Config().timeseries_start
+            start = Config("usdmep").timeseries_start
             logger.info(f"Table does not exist, defaulting to {start:%Y-%m-%d}")
 
     headers = {
