@@ -6,6 +6,11 @@ resources:
       catalog_name: personal
       comment: Immutable source files and extraction outputs
 
+    silver:
+      name: silver
+      catalog_name: personal
+      comment: Intermediate processed results
+
     argmacro:
       name: argmacro
       catalog_name: personal
@@ -23,3 +28,15 @@ resources:
         catalog_name: personal
         schema_name: raw
         comment: ISAC file downloads from INDEC
+
+      cpau_downloads_raw:
+        name: cpau_downloads
+        catalog_name: personal
+        schema_name: raw
+        comment: RAW CPAU file downloads
+
+      cpau_downloads_silver:
+        name: cpau_downloads
+        catalog_name: personal
+        schema_name: silver
+        comment: Processed CPAU file downloads

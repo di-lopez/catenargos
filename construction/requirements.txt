@@ -1,0 +1,6 @@
+dateparser==1.4.3
+pymupdf==1.28.0
+loguru==0.7.3
+Pillow==12.3.0
+google-genai==2.24.0
+pydantic==2.13.5

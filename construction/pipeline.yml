@@ -1,0 +1,36 @@
+resources:
+  jobs:
+    cpau_file_parse:
+      name: parse_cpau_file
+
+      trigger:
+        file_arrival:
+          url: "/Volumes/personal/raw/cpau_downloads/"
+          min_time_between_triggers_seconds: 60
+
+      parameters:
+        - name: file_path
+          default: "{{job.trigger.file_arrival.location}}"
+
+      tasks:
+        - task_key: parse
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/construction/process_file.py
+            parameters:
+              - "--file"
+              - "{{job.parameters.file_path}}"
+              - "--catalog"
+              - "personal"
+              - "--schema"
+              - "silver"
+              - "--volume"
+              - "cpau_downloads"
+              - "--table"
+              - "construction"
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - -r ${workspace.file_path}/construction/requirements.txt
