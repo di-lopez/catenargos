@@ -32,7 +32,7 @@ def process_image(image_path: Path, api_key: str) -> list[dict]:
 
     # 4. Call Gemini with Structured Output enforcing the schema
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model="gemini-3.5-flash-lite",
         contents=[
             image,
             (
