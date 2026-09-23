@@ -1,0 +1,3 @@
+cpau:
+  timeseries_start: 2020-12-01 # previous releases have been manually downloaded
+  table_name: cpau

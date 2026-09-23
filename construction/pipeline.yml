@@ -34,3 +34,26 @@ resources:
             client: "5"
             dependencies:
               - -r ${workspace.file_path}/construction/requirements.txt
+
+    fetch_cpau:
+      name: fetch_cpau
+      schedule:
+        quartz_cron_expression: "0 0 21 * * ?"
+        timezone_id: "UTC"
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: cpau
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/construction/fetch_cpau.py
+            parameters:
+              - "--catalog"
+              - "personal"
+              - "--volume"
+              - "cpau_downloads"
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - -r ${workspace.file_path}/construction/requirements.txt
