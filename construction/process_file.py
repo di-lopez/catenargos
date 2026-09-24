@@ -8,8 +8,8 @@ import fitz
 import pandas as pd
 from loguru import logger
 from process_image import process_image
-from pyspark.sql import SparkSession
 from pyspark.dbutils import DBUtils
+from pyspark.sql import SparkSession
 
 
 class FileProcessor:
@@ -143,6 +143,9 @@ class CPAUParser:
                 base_image = self.pdf_doc.extract_image(xref)
                 if base_image["smask"] > 0:
                     # This is usually the "ARQ Clarin" logo, ignore
+                    continue
+                if base_image["size"] < 20000:
+                    # This is too small for the typical sizes we expect
                     continue
 
                 image_counter += 1
