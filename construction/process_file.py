@@ -141,9 +141,6 @@ class CPAUParser:
             for img in page.get_images():
                 xref = img[0]
                 base_image = self.pdf_doc.extract_image(xref)
-                if base_image["smask"] > 0:
-                    # This is usually the "ARQ Clarin" logo, ignore
-                    continue
                 if base_image["size"] < 20000:
                     # This is too small for the typical sizes we expect
                     continue
