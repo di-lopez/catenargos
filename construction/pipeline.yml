@@ -6,7 +6,7 @@ resources:
       trigger:
         file_arrival:
           url: "/Volumes/personal/raw/cpau_downloads/"
-          min_time_between_triggers_seconds: 60
+          min_time_between_triggers_seconds: 600
 
       parameters:
         - name: file_path
@@ -16,7 +16,7 @@ resources:
         - task_key: parse
           environment_key: env
           spark_python_task:
-            python_file: ${workspace.file_path}/construction/process_file.py
+            python_file: ${workspace.file_path}/construction/etl/process_file.py
             parameters:
               - "--file"
               - "{{job.parameters.file_path}}"
@@ -33,7 +33,7 @@ resources:
           spec:
             client: "5"
             dependencies:
-              - -r ${workspace.file_path}/construction/requirements.txt
+              - -r ${workspace.file_path}/construction/etl/requirements.txt
 
     fetch_cpau:
       name: fetch_cpau
@@ -45,7 +45,7 @@ resources:
         - task_key: cpau
           environment_key: env
           spark_python_task:
-            python_file: ${workspace.file_path}/construction/fetch_cpau.py
+            python_file: ${workspace.file_path}/construction/etl/fetch_cpau.py
             parameters:
               - "--catalog"
               - "personal"
@@ -56,4 +56,29 @@ resources:
           spec:
             client: "5"
             dependencies:
-              - -r ${workspace.file_path}/construction/requirements.txt
+              - -r ${workspace.file_path}/construction/etl/requirements.txt
+
+    dbt_construction:
+      name: dbt_construction
+      # trigger:
+      #   table_update:
+      #     table_names:
+      #       - personal.silver.cpau
+      tasks:
+        - task_key: dbt_build
+          dbt_task:
+            project_directory: ${workspace.file_path}/construction/construction
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run
+            warehouse_id: ${var.warehouse_id}
+            catalog: personal
+            schema: silver
+          environment_key: env
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - dbt-databricks

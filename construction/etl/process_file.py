@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -156,15 +157,48 @@ class CPAUParser:
             text = page.get_text("text")
 
             if (
+                "ndice general" in text.lower()
+                and self.START_PHRASE.lower() in text.lower()
+            ):
+                start_page, end_page = self._get_slice_from_index(page)
+
+                if start_page is not None:
+                    return start_page, end_page
+
+            if (
                 start_page is None
                 and self.START_PHRASE.lower() in text.lower()
-                and "índice general" not in text.lower()
+                and "ndice general" not in text.lower()
             ):
                 start_page = page_num
 
             if start_page is not None and self.END_PHRASE.lower() in text.lower():
                 end_page = page_num
                 break
+
+        return start_page, end_page
+
+    def _get_slice_from_index(self, index_page):
+        logger.info("Attempting to get target pdf slice from index")
+        index = [
+            l.strip() for l in index_page.get_text("text").split("\n") if l.strip()
+        ]
+
+        start_page, end_page = None, None
+
+        i = 0
+        while i < len(index):
+            if self.START_PHRASE.lower() in index[i].lower():
+                start_page = int(re.search(r"(\d+)", index[i + 1]).group(1)) - 1
+                end_page = int(re.search(r"(\d+)", index[i + 3]).group(1)) - 1
+                break
+            i += 1
+
+        if not start_page:
+            msg = "Unable to find relevant slice from index"
+            logger.warning(msg)
+
+        logger.info(f"Found slice {start_page} to {end_page} from index")
 
         return start_page, end_page
 
