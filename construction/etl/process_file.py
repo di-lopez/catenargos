@@ -17,12 +17,14 @@ class FileProcessor:
     def __init__(
         self,
         file_path: Path,
+        model: str,
         catalog: str,
         schema: str,
         volume: str,
         table_name: str,
     ):
         self.file_path = file_path
+        self.model = model
         self.catalog = catalog
         self.schema = schema
         self.volume = volume
@@ -87,7 +89,7 @@ class FileProcessor:
             image_path.write_bytes(image_data)
 
             logger.info("Processing image")
-            image_data = process_image(image_path, self.api_key)
+            image_data = process_image(image_path, self.model, self.api_key)
 
             logger.info(f"Extracted image data:\n{json.dumps(image_data, indent=2)}")
 
@@ -246,6 +248,7 @@ class CPAUParser:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--file")
+    parser.add_argument("--model", required=True)
     parser.add_argument("--catalog", required=True)
     parser.add_argument("--schema", required=True)
     parser.add_argument("--table", required=True)
@@ -258,6 +261,7 @@ def main():
     for path in pdf_paths:
         FileProcessor(
             path,
+            args.model,
             args.catalog,
             args.schema,
             args.volume,

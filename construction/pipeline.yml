@@ -11,6 +11,8 @@ resources:
       parameters:
         - name: file_path
           default: "{{job.trigger.file_arrival.location}}"
+        - name: model
+          default: gemini-3.5-flash-lite
 
       tasks:
         - task_key: parse
@@ -20,6 +22,8 @@ resources:
             parameters:
               - "--file"
               - "{{job.parameters.file_path}}"
+              - "--model"
+              - "{{job.parameters.model}}"
               - "--catalog"
               - "personal"
               - "--schema"
@@ -27,7 +31,7 @@ resources:
               - "--volume"
               - "cpau_downloads"
               - "--table"
-              - "construction"
+              - "cpau"
       environments:
         - environment_key: env
           spec:

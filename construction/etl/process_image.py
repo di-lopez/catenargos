@@ -54,14 +54,14 @@ class PageExtraction(BaseModel):
     models: list[ModelEntry]
 
 
-def process_image(image_path: Path, api_key: str) -> list[dict]:
+def process_image(image_path: Path, model: str, api_key: str) -> list[dict]:
     image = Image.open(image_path)
     client = genai.Client(api_key=api_key)
 
     gemini_limiter.wait()  # blocks until a slot is available
 
     response = client.models.generate_content(
-        model=Config("cpau").llm_model,
+        model=model,
         contents=[
             image,
             (
