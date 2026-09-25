@@ -184,13 +184,33 @@ class CPAUParser:
             l.strip() for l in index_page.get_text("text").split("\n") if l.strip()
         ]
 
+        # Calculate a page shift in case there is a cover page that is not indexed
+        document_page_counter = re.search(
+            r"gina \d+ de (\d+)",
+            index_page.get_text("text"),
+        )
+
+        # Number of pages quoted in the document
+        document_page_count = (
+            int(document_page_counter.group(1))
+            if document_page_counter
+            else len(self.pdf_doc)
+        )
+
+        # If actual doc length > quoted length, shift != 0
+        page_shift = len(self.pdf_doc) - document_page_count
+
         start_page, end_page = None, None
 
         i = 0
         while i < len(index):
             if self.START_PHRASE.lower() in index[i].lower():
-                start_page = int(re.search(r"(\d+)", index[i + 1]).group(1)) - 1
-                end_page = int(re.search(r"(\d+)", index[i + 3]).group(1)) - 1
+                start_page = (
+                    int(re.search(r"(\d+)", index[i + 1]).group(1)) - 1 + page_shift
+                )
+                end_page = (
+                    int(re.search(r"(\d+)", index[i + 3]).group(1)) - 1 + page_shift
+                )
                 break
             i += 1
 
