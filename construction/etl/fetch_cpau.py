@@ -78,12 +78,16 @@ class YearSection(BaseModel):
 
 def find_latest_download(catalog: str, volume: str):
     volume = Path("/Volumes") / catalog / "raw" / volume
-    files = list(volume.glob("*.pdf"))
+    files = list(volume.glob("*"))
     if not files:
         return None
 
     dates = [
-        datetime(int(file.name.split("_")[0]), int(file.name.split("_")[1]), 1).date()
+        datetime(
+            int(re.search(r"(\d{4})", file.name).group(1)),
+            int(re.search(r"_(\d{2})\.", file.name).group(1)),
+            1,
+        ).date()
         for file in files
     ]
     return max(dates)
