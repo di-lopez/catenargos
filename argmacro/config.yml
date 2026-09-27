@@ -2,6 +2,10 @@ usdmep:
   timeseries_start: 2024-01-01
   table_name: usdmep
 
+usdblue:
+  timeseries_start: 2013-01-01
+  table_name: usdblue
+
 ipc:
   excel_target_sheet_name: "Índices IPC Cobertura Nacional"
   table_name: ipc
