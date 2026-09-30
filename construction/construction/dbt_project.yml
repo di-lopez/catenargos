@@ -31,5 +31,11 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   construction:
-    +materialized: table
-    +submission_method: serverless_cluster
+    silver:
+      +materialized: table
+      +submission_method: serverless_cluster
+      +schema: silver
+    argmacro:
+      +materialized: table
+      +submission_method: serverless_cluster
+      +schema: argmacro

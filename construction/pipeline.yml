@@ -73,9 +73,7 @@ resources:
           dbt_task:
             project_directory: ${workspace.file_path}/construction/construction
             commands:
-              - dbt deps
-              - dbt seed
-              - dbt run
+              - dbt build
             warehouse_id: ${var.warehouse_id}
             catalog: personal
             schema: silver

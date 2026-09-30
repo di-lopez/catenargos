@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: silver
+    database: personal
+    schema: silver
+    tables:
+      - name: cpau
+
+  - name: argmacro
+    database: personal
+    schema: argmacro
+    tables:
+      - name: usdblue
+
+models:
+  - name: cpau_full
+    description: "Full timeseries from CPAU"
+    columns:
+      - name: date
+        tests:
+          - not_null
+      - name: model_type
+        tests:
+          - not_null
+      - name: arsm2
+        tests:
+          - not_null

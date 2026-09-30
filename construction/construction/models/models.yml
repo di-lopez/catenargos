@@ -1,8 +1,0 @@
-version: 2
-
-sources:
-  - name: silver
-    database: personal
-    schema: silver
-    tables:
-      - name: cpau
