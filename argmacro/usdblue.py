@@ -108,6 +108,16 @@ def get_usdblue(
     fetched_row_count = len(df)
     logger.info(f"Fetched {fetched_row_count} rows")
 
+    full_date_axis = pd.DataFrame(
+        {"date": pd.date_range(start=start, end=today, freq="D")},
+    )
+
+    df = df.merge(full_date_axis, how="outer", on=["date"]).assign(
+        value=lambda x: x.value.ffill().bfill(),
+    )
+
+    df["date"] = df["date"].dt.strftime("%Y-%m-%d")
+
     df = spark.createDataFrame(df).withColumn("date", f.col("date").cast("date"))
 
     if spark.catalog.tableExists(table_name):
