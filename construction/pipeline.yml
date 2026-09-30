@@ -64,10 +64,10 @@ resources:
 
     dbt_construction:
       name: dbt_construction
-      # trigger:
-      #   table_update:
-      #     table_names:
-      #       - personal.silver.cpau
+      trigger:
+        table_update:
+          table_names:
+            - personal.silver.cpau
       tasks:
         - task_key: dbt_build
           dbt_task:

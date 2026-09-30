@@ -1,12 +1,12 @@
 WITH joined AS (
 SELECT
-    date,
+    date_trunc('month', date) as date,
     trim(lower(model_type)) as model_type,
     arsm2
 FROM {{ source("silver", "cpau") }}
 UNION ALL
 SELECT
-    date,
+    date_trunc('month', date) as date,
     trim(lower(replace(model_type, "_", " "))) as model_type,
     arsm2
 FROM {{ ref("cpau_backdata") }}
@@ -39,7 +39,7 @@ cleaned AS (
 
 -- Add usdm2 column
 SELECT
-    c.date,
+    CAST(c.date AS DATE) AS date,
     c.model_type,
     c.arsm2,
     c.arsm2 / m.value AS usdm2
