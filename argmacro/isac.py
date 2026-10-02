@@ -67,7 +67,7 @@ class FileProcessor(BaseFileProcessor):
                     "month",
                     "isac_general",
                     "isac_desestacionalizado",
-                    "isac_tendendiaciclo",
+                    "isac_tendenciaciclo",
                 ],
             )
             .dropna(subset=["isac_general"])
