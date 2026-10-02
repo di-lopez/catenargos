@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import date, datetime, timezone
 from pathlib import Path
+from typing import Literal
 
 import pyspark.sql.functions as f
 import requests
@@ -29,13 +30,14 @@ class BaseFileProcessor(ABC):
         table_name: str,
         file_date: datetime,
         prefix: str = "",
+        suffix: Literal["xls", "csv"] = "xls",
     ):
         self.file = file
         self.catalog = catalog
         self.schema = schema
         self.volume = volume
         self.table_name = table_name
-        self.file_name = f"{prefix}{file_date.year}_{file_date.month:02}.xls"
+        self.file_name = f"{prefix}{file_date.year}_{file_date.month:02}.{suffix}"
         self.spark = SparkSession.builder.getOrCreate()
         self.spark.catalog.setCurrentCatalog(catalog)
         self.spark.catalog.setCurrentDatabase(schema)
@@ -45,11 +47,25 @@ class BaseFileProcessor(ABC):
         return Path("/Volumes") / self.catalog / "raw" / self.volume / self.file_name
 
     def process(self):
-        self.store_file()
 
         logger.info("Starting file parsing")
         df = self.parse_file()
         logger.info("Completed file parsing")
+
+        latest_date_in_file = df.select(
+            f.max("date").cast("date").alias("latest"),
+        ).collect()[0]["latest"]
+        logger.info(f"Latest date in file is {latest_date_in_file:%b %Y}")
+
+        if self.spark.catalog.tableExists(self.table_name):
+            latest_date_in_table = get_latest_date(self.spark, self.table_name)
+            logger.info(f"Latest date in table is {latest_date_in_table:%b %Y}")
+
+            if latest_date_in_table >= latest_date_in_file:
+                logger.info("File is already up to date. Nothing to do, exiting")
+                return
+
+        self.store_file()
 
         logger.info("Writing to table")
         self.write_table(df)
@@ -81,7 +97,10 @@ class BaseFileDownloader(ABC):
 
     FILE_SIZE_TOLERANCE = 0.75
 
-    def __init__(self, date: datetime | None = None):
+    def __init__(
+        self,
+        date: datetime | None = None,
+    ):
         self.date = date or datetime.now(tz=timezone.utc)
 
     @property
@@ -118,7 +137,10 @@ class BaseFileDownloader(ABC):
         # Verify the server reports an Excel file rather than HTML
         content_type = res.headers.get("Content-Type", "").lower()
 
-        return "excel" in content_type
+        if "xls" in self.url:
+            return "excel" in content_type
+
+        return "application/octet-stream" in content_type
 
     def get_file(self):
         logger.info(f"Attempting download of file for {self.month}/{self.year}")

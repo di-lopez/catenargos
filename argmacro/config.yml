@@ -15,3 +15,7 @@ isac:
   excel_target_sheet_name: "Cuadro 1"
   table_name: isac
   volume: "isac_downloads" # hard-coded to be within raw schema
+
+icc:
+  table_name: icc
+  volume: "icc_downloads" # hard-coded to be within raw schema
