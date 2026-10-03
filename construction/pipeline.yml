@@ -62,8 +62,8 @@ resources:
             dependencies:
               - -r ${workspace.file_path}/construction/etl/requirements.txt
 
-    dbt_construction:
-      name: dbt_construction
+    dbt_cpau:
+      name: dbt_cpau
       trigger:
         table_update:
           table_names:
@@ -73,7 +73,30 @@ resources:
           dbt_task:
             project_directory: ${workspace.file_path}/construction/construction
             commands:
-              - dbt build
+              - dbt build --select +cpau+
+            warehouse_id: ${var.warehouse_id}
+            catalog: personal
+            schema: silver
+          environment_key: env
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - dbt-databricks
+
+    dbt_icc:
+      name: dbt_icc
+      trigger:
+        table_update:
+          table_names:
+            - personal.silver.icc
+      tasks:
+        - task_key: dbt_build
+          dbt_task:
+            project_directory: ${workspace.file_path}/construction/construction
+            commands:
+              - dbt build --select +icc+
             warehouse_id: ${var.warehouse_id}
             catalog: personal
             schema: silver

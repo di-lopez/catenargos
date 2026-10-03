@@ -45,7 +45,7 @@ class FileProcessor(BaseFileProcessor):
             .rename(
                 columns={
                     "periodo": "date",
-                    "nivel_general_aperturas": "index",
+                    "nivel_general_aperturas": "index_type",
                     "indice_icc": "value",
                 },
             )

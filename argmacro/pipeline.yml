@@ -140,7 +140,7 @@ resources:
               - "--catalog"
               - "personal"
               - "--schema"
-              - "argmacro"
+              - "silver"
               - "--table"
               - "icc"
               - "--date"

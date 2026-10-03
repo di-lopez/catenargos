@@ -6,6 +6,7 @@ sources:
     schema: silver
     tables:
       - name: cpau
+      - name: icc
 
   - name: argmacro
     database: personal
