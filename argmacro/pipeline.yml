@@ -151,3 +151,75 @@ resources:
             client: "5"
             dependencies:
               - loguru
+
+    ipc_update_notifier:
+      name: ipc_notifier
+      trigger:
+        table_update:
+          table_names:
+            - personal.argmacro.ipc
+          min_time_between_triggers_seconds: 60
+      email_notifications:
+        on_success:
+          - "${var.email}"
+      parameters:
+        - name: updated_table
+          default: "{{job.trigger.table_update.updated_tables}}"
+      tasks:
+        - task_key: noop
+          notebook_task:
+            notebook_path: ${workspace.file_path}/argmacro/noop.py
+
+    icc_update_notifier:
+      name: icc_notifier
+      trigger:
+        table_update:
+          table_names:
+            - personal.argmacro.icc
+          min_time_between_triggers_seconds: 60
+      email_notifications:
+        on_success:
+          - "${var.email}"
+      parameters:
+        - name: updated_table
+          default: "{{job.trigger.table_update.updated_tables}}"
+      tasks:
+        - task_key: noop
+          notebook_task:
+            notebook_path: ${workspace.file_path}/argmacro/noop.py
+
+    isac_update_notifier:
+      name: isac_notifier
+      trigger:
+        table_update:
+          table_names:
+            - personal.argmacro.isac
+          min_time_between_triggers_seconds: 60
+      email_notifications:
+        on_success:
+          - "${var.email}"
+      parameters:
+        - name: updated_table
+          default: "{{job.trigger.table_update.updated_tables}}"
+      tasks:
+        - task_key: noop
+          notebook_task:
+            notebook_path: ${workspace.file_path}/argmacro/noop.py
+
+    cpau_update_notifier:
+      name: cpau_notifier
+      trigger:
+        table_update:
+          table_names:
+            - personal.argmacro.cpau
+          min_time_between_triggers_seconds: 60
+      email_notifications:
+        on_success:
+          - "${var.email}"
+      parameters:
+        - name: updated_table
+          default: "{{job.trigger.table_update.updated_tables}}"
+      tasks:
+        - task_key: noop
+          notebook_task:
+            notebook_path: ${workspace.file_path}/argmacro/noop.py

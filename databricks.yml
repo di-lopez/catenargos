@@ -12,10 +12,11 @@ include:
 variables:
   warehouse_id:
     default: 00863a62922a1c78
+  email:
+    default: diego.lopez217@gmail.com
 
 targets:
   dev:
-
     default: true
     workspace:
       host: https://dbc-6a88e8ae-d4f6.cloud.databricks.com
