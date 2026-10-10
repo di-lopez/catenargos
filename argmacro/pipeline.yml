@@ -154,6 +154,8 @@ resources:
 
     ipc_update_notifier:
       name: ipc_notifier
+      tags:
+        alerting: alerting
       trigger:
         table_update:
           table_names:
@@ -167,11 +169,18 @@ resources:
           default: "{{job.trigger.table_update.updated_tables}}"
       tasks:
         - task_key: noop
-          notebook_task:
-            notebook_path: ${workspace.file_path}/argmacro/noop.py
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/argmacro/noop.py
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
 
     icc_update_notifier:
       name: icc_notifier
+      tags:
+        alerting: alerting
       trigger:
         table_update:
           table_names:
@@ -185,11 +194,18 @@ resources:
           default: "{{job.trigger.table_update.updated_tables}}"
       tasks:
         - task_key: noop
-          notebook_task:
-            notebook_path: ${workspace.file_path}/argmacro/noop.py
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/argmacro/noop.py
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
 
     isac_update_notifier:
       name: isac_notifier
+      tags:
+        alerting: alerting
       trigger:
         table_update:
           table_names:
@@ -203,11 +219,18 @@ resources:
           default: "{{job.trigger.table_update.updated_tables}}"
       tasks:
         - task_key: noop
-          notebook_task:
-            notebook_path: ${workspace.file_path}/argmacro/noop.py
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/argmacro/noop.py
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
 
     cpau_update_notifier:
       name: cpau_notifier
+      tags:
+        alerting: alerting
       trigger:
         table_update:
           table_names:
@@ -221,5 +244,10 @@ resources:
           default: "{{job.trigger.table_update.updated_tables}}"
       tasks:
         - task_key: noop
-          notebook_task:
-            notebook_path: ${workspace.file_path}/argmacro/noop.py
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/argmacro/noop.py
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
