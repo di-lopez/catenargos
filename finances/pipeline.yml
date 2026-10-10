@@ -1,0 +1,21 @@
+resources:
+  jobs:
+    dbt_finances:
+      name: dbt_finances
+      tasks:
+        - task_key: dbt_build
+          dbt_task:
+            project_directory: ${workspace.file_path}/finances/finances
+            commands:
+              - dbt deps
+              - dbt build
+            warehouse_id: ${var.warehouse_id}
+            catalog: personal
+            schema: finances
+          environment_key: env
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - dbt-databricks

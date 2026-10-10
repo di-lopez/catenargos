@@ -16,6 +16,11 @@ resources:
       catalog_name: personal
       comment: Argentina Macroeconomic Series
 
+    finances:
+      name: finances
+      catalog_name: personal
+      comment: Personal Finances Series
+
   volumes:
       ipc_downloads:
         name: ipc_downloads

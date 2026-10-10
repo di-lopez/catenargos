@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: ticker_price
+    description: Current market price and currency for every non-cash portfolio ticker.
+    columns:
+      - name: ticker
+        tests:
+          - not_null
+
+      - name: price
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+      - name: currency
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["USD", "GBp", "GBP"]
