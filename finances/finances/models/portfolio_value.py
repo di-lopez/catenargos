@@ -4,15 +4,24 @@ import yfinance as yf
 
 def model(dbt, session):
 
-    portfolio = dbt.ref("portfolio").withColumn("currency", f.col("currency").upper())
+    dbt.config(
+        materialized="incremental",
+        unique_key=["ts"],
+        incremental_strategy="merge",
+    )
 
-    stock = portfolio.filter(f.col("ticker") != "cash").select("ticker", "units")
+    portfolio = dbt.ref("portfolio").withColumn("currency", f.upper("currency"))
+
+    stock = portfolio.filter(f.col("ticker") != "cash").select(
+        "ticker", "units", "platform"
+    )
     cash = (
         portfolio.filter(f.col("ticker") == "cash")
         .select(
             "ticker",
             "units",
             "currency",
+            "platform",
         )
         .withColumn("price", f.lit(1))
     )
@@ -21,6 +30,7 @@ def model(dbt, session):
 
     # FX rate
     gbpusd = yf.Ticker("GBPUSD=X").info["regularMarketPrice"]
+    arsusd = dbt.source("argmacro", "usdmep").select(f.last("value")).collect()[0][0]
 
     return (
         stock.join(
@@ -30,6 +40,7 @@ def model(dbt, session):
         )
         .unionByName(cash)
         .withColumn("gbpusd", f.lit(gbpusd))
+        .withColumn("arsusd", f.lit(arsusd))
         .withColumn(
             "usd_price",
             f.when(
@@ -40,6 +51,7 @@ def model(dbt, session):
                 f.col("currency") == "GBp",  # Pence
                 f.col("price") * f.col("gbpusd") / 100,
             )
+            .when(f.col("currency") == "ARS", f.col("price") / f.col("arsusd"))
             .otherwise(f.col("price")),
         )
         .withColumn(
@@ -47,7 +59,7 @@ def model(dbt, session):
             f.col("units") * f.col("usd_price"),
         )
         .withColumn(
-            "date",
-            f.current_date(),
+            "ts",
+            f.current_timestamp(),
         )
     )

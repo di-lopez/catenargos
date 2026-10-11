@@ -1,5 +1,12 @@
 version: 2
 
+sources:
+  - name: argmacro
+    database: personal
+    schema: argmacro
+    tables:
+      - name: usdmep
+
 models:
   - name: ticker_price
     description: Current market price and currency for every non-cash portfolio ticker.
@@ -21,3 +28,66 @@ models:
           - accepted_values:
               arguments:
                 values: ["USD", "GBp", "GBP"]
+
+  - name: portfolio_value
+    description: Daily USD valuation of portfolio holdings and cash balances.
+
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - date
+              - ticker
+              - units
+
+    columns:
+      - name: date
+        tests:
+          - not_null
+
+      - name: ticker
+        tests:
+          - not_null
+
+      - name: units
+        tests:
+          - not_null
+
+      - name: currency
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["USD", "GBP", "GBp", "ARS"]
+
+      - name: price
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+      - name: gbpusd
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+      - name: arsusd
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+      - name: usd_price
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+      - name: value
+        tests:
+          - not_null
