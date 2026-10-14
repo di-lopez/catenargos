@@ -6,14 +6,18 @@ def model(dbt, session):
 
     dbt.config(
         materialized="incremental",
-        unique_key=["ts"],
+        unique_key=["date"],
         incremental_strategy="merge",
     )
+
+    gbpusd_ref = dbt.config.get("gbpusd_ref")
 
     portfolio = dbt.ref("portfolio").withColumn("currency", f.upper("currency"))
 
     stock = portfolio.filter(f.col("ticker") != "cash").select(
-        "ticker", "units", "platform"
+        "ticker",
+        "units",
+        "platform",
     )
     cash = (
         portfolio.filter(f.col("ticker") == "cash")
@@ -30,6 +34,7 @@ def model(dbt, session):
 
     # FX rate
     gbpusd = yf.Ticker("GBPUSD=X").info["regularMarketPrice"]
+    gbpusd = min(gbpusd, gbpusd_ref)
     arsusd = dbt.source("argmacro", "usdmep").select(f.last("value")).collect()[0][0]
 
     return (
@@ -59,7 +64,7 @@ def model(dbt, session):
             f.col("units") * f.col("usd_price"),
         )
         .withColumn(
-            "ts",
-            f.current_timestamp(),
+            "date",
+            f.current_date(),
         )
     )

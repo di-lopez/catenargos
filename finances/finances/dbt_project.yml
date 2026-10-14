@@ -43,3 +43,5 @@ models:
             dependencies:
               - yfinance==1.7.0
               - loguru==0.7.3
+
+    +gbpusd_ref: 1.3

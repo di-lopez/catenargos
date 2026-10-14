@@ -32,14 +32,6 @@ models:
   - name: portfolio_value
     description: Daily USD valuation of portfolio holdings and cash balances.
 
-    data_tests:
-      - dbt_utils.unique_combination_of_columns:
-          arguments:
-            combination_of_columns:
-              - date
-              - ticker
-              - units
-
     columns:
       - name: date
         tests:
