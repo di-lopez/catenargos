@@ -2,6 +2,10 @@ resources:
   jobs:
     dbt_finances:
       name: dbt_finances
+      schedule:
+        quartz_cron_expression: "0 0 18 * * ?"
+        timezone_id: "UTC"
+        pause_status: UNPAUSED
       tasks:
         - task_key: dbt_build
           dbt_task:
