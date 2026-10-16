@@ -2,6 +2,8 @@ resources:
   jobs:
     dbt_finances:
       name: dbt_finances
+      tags:
+        finances: finances
       schedule:
         quartz_cron_expression: "0 0 18 * * ?"
         timezone_id: "UTC"

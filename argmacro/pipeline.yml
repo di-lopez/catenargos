@@ -2,6 +2,8 @@ resources:
   jobs:
     usdfx_job:
       name: fetch_usdfx
+      tags:
+        argmacro: argmacro
       schedule:
         quartz_cron_expression: "0 0 22 * * ?"
         timezone_id: "UTC"
@@ -45,6 +47,9 @@ resources:
 
     ipc_job:
       name: fetch_ipc
+      tags:
+        argmacro: argmacro
+        indec: indec
       schedule:
         quartz_cron_expression: "0 0 22 * * ?"
         timezone_id: "UTC"
@@ -76,6 +81,9 @@ resources:
 
     ipc_views:
       name: create_ipc_views
+      tags:
+        argmacro: argmacro
+        indec: indec
       trigger:
         table_update:
           table_names:
@@ -105,6 +113,9 @@ resources:
 
     isac_job:
       name: fetch_isac
+      tags:
+        argmacro: argmacro
+        indec: indec
       schedule:
         quartz_cron_expression: "0 0 22 * * ?"
         timezone_id: "UTC"
@@ -136,6 +147,9 @@ resources:
 
     icc_job:
       name: fetch_icc
+      tags:
+        argmacro: argmacro
+        indec: indec
       schedule:
         quartz_cron_expression: "0 0 22 * * ?"
         timezone_id: "UTC"

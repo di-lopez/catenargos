@@ -2,7 +2,8 @@ resources:
   jobs:
     cpau_file_parse:
       name: parse_cpau_file
-
+      tags:
+        construction: construction
       trigger:
         file_arrival:
           url: "/Volumes/personal/raw/cpau_downloads/"
@@ -45,6 +46,8 @@ resources:
 
     fetch_cpau:
       name: fetch_cpau
+      tags:
+        construction: construction
       schedule:
         quartz_cron_expression: "0 0 21 * * ?"
         timezone_id: "UTC"
@@ -71,6 +74,8 @@ resources:
 
     dbt_cpau:
       name: dbt_cpau
+      tags:
+        construction: construction
       trigger:
         table_update:
           table_names:
@@ -97,6 +102,10 @@ resources:
 
     dbt_icc:
       name: dbt_icc
+      tags:
+        construction: construction
+        argmacro: argmacro
+        indec: indec
       trigger:
         table_update:
           table_names:
