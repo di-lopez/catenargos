@@ -6,6 +6,9 @@ resources:
         quartz_cron_expression: "0 0 22 * * ?"
         timezone_id: "UTC"
         pause_status: UNPAUSED
+      email_notifications:
+        on_failure:
+          - "${var.email}"
       tasks:
         - task_key: usdmep
           environment_key: env
@@ -46,6 +49,9 @@ resources:
         quartz_cron_expression: "0 0 22 * * ?"
         timezone_id: "UTC"
         pause_status: UNPAUSED
+      email_notifications:
+        on_failure:
+          - "${var.email}"
       tasks:
         - task_key: ipc
           environment_key: env
@@ -103,6 +109,9 @@ resources:
         quartz_cron_expression: "0 0 22 * * ?"
         timezone_id: "UTC"
         pause_status: UNPAUSED
+      email_notifications:
+        on_failure:
+          - "${var.email}"
       tasks:
         - task_key: isac
           environment_key: env
@@ -131,6 +140,9 @@ resources:
         quartz_cron_expression: "0 0 22 * * ?"
         timezone_id: "UTC"
         pause_status: UNPAUSED
+      email_notifications:
+        on_failure:
+          - "${var.email}"
       tasks:
         - task_key: icc
           environment_key: env
