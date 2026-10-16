@@ -16,7 +16,8 @@ class FileDownloader(BaseFileDownloader):
 
     @property
     def url(self) -> str:
-        return f"https://www.indec.gob.ar/ftp/cuadros/economia/sh_ipc_{self.month}_{self.year}.xls"
+        # return f"https://www.indec.gob.ar/ftp/cuadros/economia/sh_ipc_{self.month}_{self.year}.xls"
+        return "https://www.indec.gob.ar/ftp/cuadros/economia/sh_ipc_divisiones.xls"
 
     @property
     def expected_size(self) -> int:
