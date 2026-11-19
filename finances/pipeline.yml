@@ -17,7 +17,7 @@ resources:
             project_directory: ${workspace.file_path}/finances/finances
             commands:
               - dbt deps
-              - dbt build
+              - dbt build --select +finances+
             warehouse_id: ${var.warehouse_id}
             catalog: personal
             schema: finances
