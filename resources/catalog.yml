@@ -51,3 +51,15 @@ resources:
         catalog_name: personal
         schema_name: silver
         comment: Processed CPAU file downloads
+
+      balance_raw:
+        name: balance_statements
+        catalog_name: personal
+        schema_name: raw
+        comment: Raw bank statements to drive the balance process
+
+      balance_silver:
+        name: balance_statements
+        catalog_name: personal
+        schema_name: silver
+        comment: Processed bank statements to drive the balance process

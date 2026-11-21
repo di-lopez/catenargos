@@ -28,3 +28,40 @@ resources:
             client: "5"
             dependencies:
               - dbt-databricks
+
+    statement_loader:
+      name: statement_loader
+      tags:
+        finances: finances
+        balance: balance
+      trigger:
+        file_arrival:
+          url: "/Volumes/personal/raw/balance_statements/"
+
+      email_notifications:
+        on_failure:
+          - "${var.email}"
+        on_success:
+          - "${var.email}"
+
+      tasks:
+        - task_key: process
+          environment_key: env
+          spark_python_task:
+            python_file: ${workspace.file_path}/finances/finances/supporting/load_statement.py
+            parameters:
+              - "--catalog"
+              - "personal"
+              - "--schema"
+              - "raw"
+              - "--volume"
+              - "balance_statements"
+              - "--table"
+              - "balance_statements"
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - loguru
+              - openpyxl
