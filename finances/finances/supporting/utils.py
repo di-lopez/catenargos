@@ -78,7 +78,14 @@ class BaseFileProcessor(ABC):
                 ).hexdigest(),
                 axis=1,
             )
-            df = self.spark.createDataFrame(df)
+            df = self.spark.createDataFrame(df).select(
+                "date",
+                "amount",
+                "description",
+                "source",
+                "transaction_id",
+            )
+
             logger.info("Completed file parsing")
 
             self.store_file(file)
@@ -89,11 +96,17 @@ class BaseFileProcessor(ABC):
 
     def write_table(self, df: DataFrame):
         incoming_count = df.count()
-        unique_df = df.dropDuplicates()
+        unique_df = df.dropDuplicates(["transaction_id"])
 
         if self.spark.catalog.tableExists(self.table_name):
-            existing_df = self.spark.table(self.table_name).select(*df.columns)
-            unique_df = unique_df.exceptAll(existing_df.dropDuplicates())
+            existing_ids = (
+                self.spark.table(self.table_name).select("transaction_id").distinct()
+            )
+            unique_df = unique_df.join(
+                existing_ids,
+                on="transaction_id",
+                how="left_anti",
+            )
 
         new_count = unique_df.count()
         duplicate_count = incoming_count - new_count
@@ -138,15 +151,21 @@ class HSBCFile(BaseFileProcessor):
         return "hsbc"
 
     def parse_file(self, file: Path) -> DataFrame:
-        return pd.read_csv(
-            file.as_posix(),
-            skipfooter=1,
-            names=["date", "description", "amount"],
-            engine="python",
-        ).assign(
-            date=lambda x: pd.to_datetime(x.date, format="%d/%m/%Y").dt.date,
-            amount=lambda x: x.amount.astype(str).str.replace(",", "").astype(float),
-            description=lambda x: x.description.astype(str).str.lower(),
+        return (
+            pd.read_csv(
+                file.as_posix(),
+                skipfooter=1,
+                names=["date", "description", "amount"],
+                engine="python",
+            )
+            .assign(
+                date=lambda x: pd.to_datetime(x.date, format="%d/%m/%Y").dt.date,
+                amount=lambda x: (
+                    x.amount.astype(str).str.replace(",", "").astype(float)
+                ),
+                description=lambda x: x.description.astype(str).str.lower(),
+            )
+            .filter(items=["date", "amount", "description"])
         )
 
 
@@ -156,8 +175,12 @@ class ToptalFile(BaseFileProcessor):
         return "toptal"
 
     def parse_file(self, file: Path) -> DataFrame:
-        return pd.read_excel(file.as_posix()).assign(
-            date=lambda x: pd.to_datetime(x["Transaction date"]).dt.date,
-            amount=lambda x: x.Amount.astype(float) / 1.3,  # convert to GBP
-            description=lambda x: x.Description.astype(str).str.lower(),
+        return (
+            pd.read_excel(file.as_posix())
+            .assign(
+                date=lambda x: pd.to_datetime(x["Transaction date"]).dt.date,
+                amount=lambda x: x.Amount.astype(float) / 1.3,  # convert to GBP
+                description=lambda x: x.Description.astype(str).str.lower(),
+            )
+            .filter(items=["date", "amount", "description"])
         )
