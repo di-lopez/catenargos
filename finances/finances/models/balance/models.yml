@@ -7,6 +7,12 @@ sources:
     tables:
       - name: balance_statements
 
+  - name: argmacro
+    database: personal
+    schema: argmacro
+    tables:
+      - name: usdblue
+
 version: 2
 
 models:
