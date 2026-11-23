@@ -1,0 +1,58 @@
+version: 2
+
+sources:
+  - name: raw
+    database: personal
+    schema: raw
+    tables:
+      - name: balance_statements
+
+version: 2
+
+models:
+  - name: filtered_statements
+    description: >
+      Transactions from raw.balance_statements after applying enabled
+      transaction filter rules and removing accounting transactions.
+    columns:
+      - name: date
+        description: Date of the transaction.
+      - name: description
+        description: Transaction description from the source statement.
+      - name: amount
+        description: Transaction amount from the source statement.
+      - name: source
+        description: Source account or statement associated with the transaction.
+      - name: transaction_id
+        description: Unique identifier for the source transaction.
+        data_tests:
+          - not_null
+          - unique
+
+  - name: statements_filter_audit
+    description: >
+      Transactions excluded by a seeded filter rule or the accounting
+      matching rule. When multiple rules match a transaction, the rule with
+      the lowest rule_id is selected.
+    columns:
+      - name: date
+        description: Date of the excluded transaction.
+      - name: description
+        description: Transaction description from the source statement.
+      - name: amount
+        description: Transaction amount from the source statement.
+      - name: source
+        description: Source account or statement associated with the transaction.
+      - name: transaction_id
+        description: Unique identifier for the excluded source transaction.
+        data_tests:
+          - not_null
+          - unique
+      - name: rule_id
+        description: Identifier of the selected exclusion rule; R000 represents the accounting match.
+        data_tests:
+          - not_null
+      - name: reason
+        description: Explanation for why the transaction was excluded.
+        data_tests:
+          - not_null

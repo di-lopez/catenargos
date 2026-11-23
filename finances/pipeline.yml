@@ -38,11 +38,11 @@ resources:
         file_arrival:
           url: "/Volumes/personal/raw/balance_statements/"
 
-      email_notifications:
-        on_failure:
-          - "${var.email}"
-        on_success:
-          - "${var.email}"
+      # email_notifications:
+      #   on_failure:
+      #     - "${var.email}"
+      #   on_success:
+      #     - "${var.email}"
 
       tasks:
         - task_key: process
@@ -65,3 +65,36 @@ resources:
             dependencies:
               - loguru
               - openpyxl
+
+    dbt_balance:
+      name: dbt_balance
+      tags:
+        finances: finances
+        balance: balance
+
+      trigger:
+        table_update:
+          table_names:
+            - personal.raw.balance_statements
+
+      # email_notifications:
+      #   on_failure:
+      #     - "${var.email}"
+
+      tasks:
+        - task_key: dbt_build
+          dbt_task:
+            project_directory: ${workspace.file_path}/finances/finances
+            commands:
+              - dbt deps
+              - dbt build --select +balance+
+            warehouse_id: ${var.warehouse_id}
+            catalog: personal
+            schema: finances
+          environment_key: env
+      environments:
+        - environment_key: env
+          spec:
+            client: "5"
+            dependencies:
+              - dbt-databricks
