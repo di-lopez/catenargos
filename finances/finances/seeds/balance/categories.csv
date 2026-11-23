@@ -1,0 +1,23 @@
+rule_id,pattern,category
+C001,"(?i)lidl|tesco|sainsbury|morrison|waitrose|asda|marks.*spencer|co op|aldi|wh smith|iceland",supermarket
+C002,costco,costco
+C003,"tfl travel|east midlands|bus|ticket machine|dlr|streatham",commute
+C004,bank of england,income - diego
+C005,nhs|hosp,income - pilar extra
+C006,transfer to card,toptal
+C007,"octopus energy|with energy|e.on next",bill - electricity
+C008,"(?=.*dd)(?=.*(?:bedford borough co|royal greenwich))",bill - council tax
+C009,water,bill - water
+C010,"voxi|bt group|ee ltd|apple.com",bill - tech:internet+phone+cloud
+C011,energie,bill - gym
+C012,"(?=.*so)(?=.*(?:michael graham|london a0f041fe))|goodlord|michael graham",rent
+C013,"park let ltd|parking|car wash|shell|halfords|dvla|dvsa|pcn|admiral|moorside legal service","auto - insurance, parking y gastos"
+C014,"western union|municipalidad de fune|fideicomiso",vida - gastos generales
+C015,"vida - expensas|vida - tgi",vida - expensas+tgi
+C016,medicina esenci,esencial obra social
+C017,"eurostar|british a|hotel|air eur|ryanair|rentalcars|expedia|american air|airport|premier inn|travelodge|akrogiali|civitatis|headout|easyjet",travel
+C018,"(?:mr|miss)\s[\w\s]+?\s\d+\.\d{8}",vida - terreno
+C019,transaction fee,transaction fees
+C020,ukvi|icslegal,visa costs
+C021,"future health|more2childcare|famly first",Sienna
+C022,amazon|amzn,Amazon

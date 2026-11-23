@@ -1,0 +1,8 @@
+rule_id,rule_type,pattern,reason,enabled
+R001,description_regex,"(?i)\b(?:etoro|aj bell|isa|ns&i)\b",Exclude ISA and related investment transactions,true
+R002,transaction_id,955ce96e3c649d2eec8cb698c675300ed11c6d8bcca9f75772c4ba868394c189,Exclude credit card payments,true
+R003,transaction_id,52db820385efdf981b974ced2ee0075b80a7459a7aea2d77a3afe8f890275ba7,Exclude NS&I cash-out,true
+R004,transaction_id,2d0a97fdbdea790eb5b6088222f824c65baefc32409c322a2f77d8d569f7f587,Remove Iphone Purchase (Adriana - money out),true
+R005,transaction_id,df877a8aab2d9ef670d90ffb631926c0d4897c903578178e05e5acf9b006e0d2,Remove Iphone Purchase (Adriana - money in),true
+R006,description_regex,"(?i)western union",Exclude Western Union transactions; VIDA is handled separately,true
+R007,description_regex,"(?i)municipalidad de fune",Exclude Municipalidad de Funes transactions,true
