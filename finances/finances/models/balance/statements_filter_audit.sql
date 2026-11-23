@@ -12,7 +12,7 @@ seed_rule_matches as (
         r.rule_id,
         r.reason
     from transactions as t
-    inner join {{ ref('transaction_filter_rules') }} as r
+    inner join {{ ref('filter_rules') }} as r
         on r.enabled = true
        and (
             (
@@ -32,7 +32,7 @@ seed_filtered as (
 
     select t.*
     from transactions as t
-    left anti join {{ ref('transaction_filter_rules') }} as r
+    left anti join {{ ref('filter_rules') }} as r
         on r.enabled = true
        and (
             (

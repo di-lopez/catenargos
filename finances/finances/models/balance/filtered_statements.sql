@@ -9,7 +9,7 @@ seed_filtered as (
 
     select t.*
     from transactions as t
-    left anti join {{ ref('transaction_filter_rules') }} as r
+    left anti join {{ ref('filter_rules') }} as r
         on r.enabled = true
        and (
             (
