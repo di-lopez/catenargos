@@ -48,6 +48,11 @@ class BaseFileProcessor(ABC):
 
     @property
     @abstractmethod
+    def currency(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
     def name(self) -> str:
         pass
 
@@ -73,6 +78,7 @@ class BaseFileProcessor(ABC):
                             row["date"],
                             row["description"],
                             row["amount"],
+                            row["currency"],
                         )
                     ).encode("utf-8"),
                 ).hexdigest(),
@@ -80,8 +86,9 @@ class BaseFileProcessor(ABC):
             )
             df = self.spark.createDataFrame(df).select(
                 "date",
-                "amount",
                 "description",
+                "amount",
+                "currency",
                 "source",
                 "transaction_id",
             )
@@ -150,6 +157,10 @@ class HSBCFile(BaseFileProcessor):
     def name(self) -> str:
         return "hsbc"
 
+    @property
+    def currency(self) -> str:
+        return "gbp"
+
     def parse_file(self, file: Path) -> DataFrame:
         return (
             pd.read_csv(
@@ -164,8 +175,9 @@ class HSBCFile(BaseFileProcessor):
                     x.amount.astype(str).str.replace(",", "").astype(float)
                 ),
                 description=lambda x: x.description.astype(str).str.lower(),
+                currency=self.currency,
             )
-            .filter(items=["date", "amount", "description"])
+            .filter(items=["date", "amount", "currency", "description"])
         )
 
 
@@ -174,13 +186,18 @@ class ToptalFile(BaseFileProcessor):
     def name(self) -> str:
         return "toptal"
 
+    @property
+    def currency(self) -> str:
+        return "usd"
+
     def parse_file(self, file: Path) -> DataFrame:
         return (
             pd.read_excel(file.as_posix())
             .assign(
                 date=lambda x: pd.to_datetime(x["Transaction date"]).dt.date,
-                amount=lambda x: x.Amount.astype(float) / 1.3,  # convert to GBP
+                amount=lambda x: x.Amount.astype(float),
                 description=lambda x: x.Description.astype(str).str.lower(),
+                currency=self.currency,
             )
-            .filter(items=["date", "amount", "description"])
+            .filter(items=["date", "amount", "currency", "description"])
         )
