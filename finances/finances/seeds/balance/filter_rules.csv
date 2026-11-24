@@ -6,3 +6,5 @@ R004,transaction_id,2d0a97fdbdea790eb5b6088222f824c65baefc32409c322a2f77d8d569f7
 R005,transaction_id,df877a8aab2d9ef670d90ffb631926c0d4897c903578178e05e5acf9b006e0d2,Remove Iphone Purchase (Adriana - money in),true
 R006,description_regex,"(?i)western union",Exclude Western Union transactions; VIDA is handled separately,true
 R007,description_regex,"(?i)municipalidad de fune",Exclude Municipalidad de Funes transactions,true
+R008,transaction_id,20151fd6c63acea1307fa00635b070d30a09fc1eeeea07d9d0871b748d35c27b,Exclude NS&I Cash-out,true
+R009,transaction_id,01513758c08a00aa5816398ce19c1069ad19144282ce3642b0948f8373652421,Vida terreno credit,true
