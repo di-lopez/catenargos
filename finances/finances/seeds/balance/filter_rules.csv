@@ -1,10 +1,17 @@
 rule_id,rule_type,pattern,reason,enabled
 R001,description_regex,"(?i)\b(?:etoro|aj bell|isa|ns&i)\b",Exclude ISA and related investment transactions,true
-R002,transaction_id,955ce96e3c649d2eec8cb698c675300ed11c6d8bcca9f75772c4ba868394c189,Exclude credit card payments,true
-R003,transaction_id,52db820385efdf981b974ced2ee0075b80a7459a7aea2d77a3afe8f890275ba7,Exclude NS&I cash-out,true
-R004,transaction_id,2d0a97fdbdea790eb5b6088222f824c65baefc32409c322a2f77d8d569f7f587,Remove Iphone Purchase (Adriana - money out),true
-R005,transaction_id,df877a8aab2d9ef670d90ffb631926c0d4897c903578178e05e5acf9b006e0d2,Remove Iphone Purchase (Adriana - money in),true
-R006,description_regex,"(?i)western union",Exclude Western Union transactions; VIDA is handled separately,true
-R007,description_regex,"(?i)municipalidad de fune",Exclude Municipalidad de Funes transactions,true
-R008,transaction_id,20151fd6c63acea1307fa00635b070d30a09fc1eeeea07d9d0871b748d35c27b,Exclude NS&I Cash-out,true
-R009,transaction_id,01513758c08a00aa5816398ce19c1069ad19144282ce3642b0948f8373652421,Vida terreno credit,true
+R002,transaction_id,20151fd6c63acea1307fa00635b070d30a09fc1eeeea07d9d0871b748d35c27b,Exclude NS&I cash-out,true
+R003,transaction_id,7606fe6e0a75c6396e7c1874c0c6520d4040d05ac86498d2f84f1634f6b2ccd5,Remove Iphone Purchase (Adriana - money out),true
+R004,transaction_id,f94daa000cfa4fcb228245d5518bcb354191faf1dc6b024e6c4ae1b41095b2e3,Remove Iphone Purchase (Adriana - money in),true
+R005,description_regex,"(?i)western union",Exclude Western Union transactions; VIDA is handled separately,true
+R006,description_regex,"(?i)municipalidad de fune",Exclude Municipalidad de Funes transactions,true
+R007,transaction_id,01513758c08a00aa5816398ce19c1069ad19144282ce3642b0948f8373652421,Vida terreno credit,true
+R008,description_regex,"(?i)global money.*lopez",Exclude fundings of global money account,true
+R009,transaction_id,68a4138eb08553562a2dc4df23fcf82417d7d868282fbe4165caaedd4963d1e1,Instalment Plan Accounting,true
+R009,transaction_id,4d885dd21e6943f244ac9f0f1000fa05457442b1c9980faf5857f17b8b38ac30,Instalment Plan Accounting,true
+R009,transaction_id,f74e1af273e127be60482ba5620cff233f495e8907e78e65020b3fdaa8aa8e60,Instalment Plan Accounting,true
+R009,transaction_id,c61fe64dbaf019f94730b6d731614505d141d8d23dacfaba92c9a58076391b00,Instalment Plan Accounting,true
+R009,transaction_id,c61248ab4e808ffb1367abaa3e55ed1c8a6c7314129aa5dd04523ebae69f6a1c,Instalment Plan Accounting,true
+R009,transaction_id,6058f51872a3a36f843fd3e16ea23450e13b5f7e5a3ba2585ed22f8275604bce,Instalment Plan Accounting,true
+R009,transaction_id,90ddc2eb601b5da0fd717c86898fa6a480ee172f97c4ccfefd9ff4dde7b616e4,Instalment Plan Accounting,true
+R009,transaction_id,472d0200ceb1eb507046b419ef660c471ae4ebdcb154185516e4c79949c51596,Instalment Plan Accounting,true
